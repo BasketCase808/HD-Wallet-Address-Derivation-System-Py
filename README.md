@@ -37,15 +37,19 @@ application/json
 
 ## Requirements
 
+
 Tested working on Ubuntu 22.04
 
+
 **Local use:**
+
 python3
 
 python pip
 
 
 **Docker use:**
+
 Docker-Compose
 
 Docker
