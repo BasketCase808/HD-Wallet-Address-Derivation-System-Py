@@ -52,6 +52,7 @@ Docker
 
 ## Setup
 ```
+mkdir ~/GIT
 cd ~/GIT
 mkdir HD-Wallet-Address-Derivation-System-Py
 cd HD-Wallet-Address-Derivation-System-Py/
