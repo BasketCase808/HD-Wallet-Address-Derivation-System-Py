@@ -6,12 +6,20 @@ HD Wallet address derivation system for extracting addresses from Master Public 
 ## How to Use
 
 (requires)  -  xpub
+
 (requires)  -  num_addresses
+
 (requires)  -  account_index
+
 (requires)  -  change_index
+
 (optional)  -  type (manually define xpub, ypub, zpub)
 
-*type: this is automatially interpreted based in prefix of 'xpub' input. Use type to manually define this.
+
+
+* *type: this is automatially interpreted based in prefix of 'xpub' input. Use type to manually define this.* *
+
+
 
 
 application/json
