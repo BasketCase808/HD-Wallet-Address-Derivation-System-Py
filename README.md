@@ -1,7 +1,7 @@
 # HD-Wallet-Address-Derivation-System-Py
 HD Wallet address derivation system for extracting addresses from Master Public Keys (xpub, ypub, zpub).
 
-**How to Use**
+## How to Use
 
 (requires)  -  xpub
 (requires)  -  num_addresses
@@ -22,7 +22,7 @@ application/json
 }
 ```
 
-##Requirements
+## Requirements
 Tested working on Ubuntu 22.04
 
 **Local use:**
@@ -34,7 +34,7 @@ Docker-Compose
 Docker
 
 
-##Setup
+## Setup
 ```
 cd ~/GIT
 mkdir HD-Wallet-Address-Derivation-System-Py
