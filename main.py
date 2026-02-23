@@ -21,12 +21,12 @@ app = FastAPI(
 class DeriveAddressesRequest(BaseModel):
     xpub: str = Field(..., description="The master public key (xpub, ypub, or zpub) from which to derive addresses.")
     num_addresses: int = Field(20, ge=1, le=100, description="The number of addresses to derive.")
-    account_index: int = Field(0, ge=0, description="The account index for derivation (e.g., 0 for the first account).")
-    change_index: int = Field(0, ge=0, le=1, description="The change index for derivation (0 for receive addresses, 1 for change addresses).")
-    address_types: Optional[List[str]] = Field(None, description="List of address types to derive. If empty or None, all supported types for the given xpub will be returned.")
+    account_index: int = Field(0, ge=0, description="The starting account index for derivation.")
+    derivation_index: int = Field(0, ge=0, description="The address index within each account (usually 0).")
+    address_types: Optional[List[str]] = Field(None, description="List of address types to derive.")
 
 class DeriveAddressesResponse(BaseModel):
-    derived_addresses: Dict[str, List[str]] = Field(..., description="An object where keys are address types and values are arrays of derived addresses.")
+    derived_addresses: Dict[str, List[str]] = Field(..., description="Derived addresses grouped by type.")
 
 @app.post("/derive-addresses", response_model=DeriveAddressesResponse)
 async def derive_addresses(request: DeriveAddressesRequest):
@@ -37,7 +37,7 @@ async def derive_addresses(request: DeriveAddressesRequest):
     }
 
     try:
-        hd_key = HDKey(request.xpub) # This handles xpub, ypub, zpub prefixes and sets internal state
+        hd_key = HDKey(request.xpub)
 
         # Determine the default address type based on the xpub prefix
         xpub_prefix = request.xpub[:4]
@@ -48,34 +48,26 @@ async def derive_addresses(request: DeriveAddressesRequest):
             default_address_type = 'p2sh_segwit'
         elif xpub_prefix == 'zpub':
             default_address_type = 'bech32'
-        
-        if not default_address_type:
-             raise HTTPException(status_code=400, detail="Unsupported xpub type. Must be xpub, ypub, or zpub for implicit address type derivation.")
 
-        # If specific address types are requested, filter them. Otherwise, use the default.
+        if not default_address_type:
+             raise HTTPException(status_code=400, detail="Unsupported xpub type.")
+
         types_to_derive = request.address_types if request.address_types else [default_address_type]
 
+        # Iterate through account indices
+        for i in range(request.account_index, request.account_index + request.num_addresses):
+            # Path: account / change / address_index
+            path = f"{i}/{request.derivation_index}"
+            child_key = hd_key.subkey_for_path(path)
 
-        for i in range(request.num_addresses):
-            # Derivation path: change_index / address_index from the HDKey
-            child_key = hd_key.subkey_for_path(f"{request.change_index}/{i}")
-
-            # bitcoinlib's HDKey.address() method will return the appropriate address type
-            # based on the initial HDKey's type (xpub, ypub, zpub)
-            
-            # Populate the list for the default/requested address type
             if default_address_type in types_to_derive:
                  derived_addresses[default_address_type].append(child_key.address())
 
-        # Clean up empty lists and ensure only requested types are returned
-        final_derived_addresses = {}
-        for k, v in derived_addresses.items():
-            if v and (not request.address_types or k in request.address_types):
-                final_derived_addresses[k] = v
+        final_derived_addresses = {k: v for k, v in derived_addresses.items() if v}
 
     except Exception as e:
-        print(f"Error during address derivation: {e}") # Log for debugging
-        raise HTTPException(status_code=400, detail=f"Error deriving addresses: {str(e)}. Please check your xpub and derivation parameters.")
+        print(f"Error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
     return {"derived_addresses": final_derived_addresses}
 
