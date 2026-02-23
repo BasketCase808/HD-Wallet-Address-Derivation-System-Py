@@ -7,17 +7,15 @@ HD Wallet address derivation system for extracting addresses from Master Public 
 
 (requires)  -  xpub
 
-(requires)  -  num_addresses
+(requires)  -  num_addresses                                    -     (default: 20)
 
-(requires)  -  account_index
+(requires)  -  account_index                                    -     (default: 0)
 
-(requires)  -  change_index
+(requires)  -  derivation_index                                 -     (default: 0)
 
-(optional)  -  type (manually define xpub, ypub, zpub)
+(optional)  -  type (manually define xpub, ypub, zpub)          -     (default: zpub)
 
-
-
-* *type: this is automatially interpreted based in prefix of 'xpub' input. Use type to manually define this.* *
+* *type: this is automatially interpreted based on the prefix of the master public key (xpub variable). Use type to manually define this.* *
 
 
 
@@ -26,9 +24,10 @@ application/json
 ```
 {
 "xpub":"zpub6mZc2YsabjXCoPD421fUTnWMDL6GkidmnW2AAcdGp5NL8zKFUtYfuT45NzyXp1GTRhGDyX4NWQQjCbt6TvzboTvFWQHKbXuV6VqkCCo33YC",
-"num_addresses":"50",
+"num_addresses":"20",
+"derivation_index":"0",
 "account_index":"0",
-"change_index":"0"
+"type":"zpub"
 }
 ```
 
@@ -43,9 +42,15 @@ Tested working on Ubuntu 22.04
 
 **Local use:**
 
-python3
+sudo apt install python3 python3-pip -y
 
-python pip
+pip install -r requirements.txt
+
+* *if you have trouble with pip accessing the internet to install requirements.txt - create a directory called 'packages' in the same directory as the main.py script. Then manually download the pip packages to to the newly created packages directory and use the following command:* *
+pip install --no-index --find-links=/app/packages fastapi uvicorn bitcoinlib python-dotenv
+
+* *run the script with:* *
+python3 main.py
 
 
 **Docker use:**
@@ -71,10 +76,11 @@ sleep 2
 curl -X POST http://localhost:8000/derive-addresses \
      -H "Content-Type: application/json" \
      -d '{
-           "xpub": "zpub6mZc2YsabjXCoPD421fUTnWMDL6GkidmnW2AAcdGp5NL8zKFUtYfuT45NzyXp1GTRhGDyX4NWQQjCbt6TvzboTvFWQHKbXuV6VqkCCo33YC",
-           "num_addresses": "21",
-           "account_index": "0",
-           "change_index": "0"
+          "xpub":"zpub6mZc2YsabjXCoPD421fUTnWMDL6GkidmnW2AAcdGp5NL8zKFUtYfuT45NzyXp1GTRhGDyX4NWQQjCbt6TvzboTvFWQHKbXuV6VqkCCo33YC",
+          "num_addresses":"20",
+          "derivation_index":"0",
+          "account_index":"0",
+          "type":"zpub"
          }'
 sleep 1
 echo "If you get a list of raw addresses, it worked!"
@@ -90,10 +96,11 @@ echo "If you get a list of raw addresses, it worked!"
 curl -X POST http://localhost:8000/derive-addresses \
      -H "Content-Type: application/json" \
      -d '{
-           "xpub": "zpub6mZc2YsabjXCoPD421fUTnWMDL6GkidmnW2AAcdGp5NL8zKFUtYfuT45NzyXp1GTRhGDyX4NWQQjCbt6TvzboTvFWQHKbXuV6VqkCCo33YC",
-           "num_addresses": "21",
-           "account_index": "0",
-           "change_index": "0"
+          "xpub":"zpub6mZc2YsabjXCoPD421fUTnWMDL6GkidmnW2AAcdGp5NL8zKFUtYfuT45NzyXp1GTRhGDyX4NWQQjCbt6TvzboTvFWQHKbXuV6VqkCCo33YC",
+          "num_addresses":"20",
+          "derivation_index":"0",
+          "account_index":"0",
+          "type":"zpub"
          }'
 
 ```
@@ -109,8 +116,12 @@ Download Poracora or Postman.
 ```
 {
 "xpub":"zpub6mZc2YsabjXCoPD421fUTnWMDL6GkidmnW2AAcdGp5NL8zKFUtYfuT45NzyXp1GTRhGDyX4NWQQjCbt6TvzboTvFWQHKbXuV6VqkCCo33YC",
-"num_addresses":"21",
+"num_addresses":"20",
+"derivation_index":"0",
 "account_index":"0",
-"change_index":"0"
+"type":"zpub"
 }
 ```
+
+First address should show:
+bc1qc3zpt8ptn35q33qlya4c337f8v7m89394j9dvs
